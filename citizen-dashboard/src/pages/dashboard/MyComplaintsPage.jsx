@@ -21,6 +21,8 @@ export default function MyComplaintsPage() {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [deletingId, setDeletingId] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const loadComplaints = async () => {
@@ -29,6 +31,7 @@ export default function MyComplaintsPage() {
         setComplaints(data);
       } catch (error) {
         console.error('Failed to load complaints', error);
+        setError('Unable to load complaints.');
       } finally {
         setLoading(false);
       }
@@ -55,6 +58,21 @@ export default function MyComplaintsPage() {
     });
   }, [complaints, search]);
 
+  const handleDelete = async (complaint) => {
+    if (!window.confirm(`Delete report ${complaint.report_code || complaint.id}?`)) return;
+
+    setDeletingId(complaint.id);
+    setError('');
+    try {
+      await service.deleteComplaint(complaint.id);
+      setComplaints((current) => current.filter((item) => item.id !== complaint.id));
+    } catch (deleteError) {
+      setError(deleteError?.response?.data?.detail || deleteError?.message || 'Unable to delete report.');
+    } finally {
+      setDeletingId('');
+    }
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -74,6 +92,10 @@ export default function MyComplaintsPage() {
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
           Report submitted successfully. Reference: {location.state.lastSubmitted.report_code || location.state.lastSubmitted.id}
         </div>
+      ) : null}
+
+      {error ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -124,12 +146,22 @@ export default function MyComplaintsPage() {
 
                   <div className="flex flex-col items-start gap-3 md:items-end">
                     <p className="text-xs text-slate-500">Updated {formatDate(complaint.updatedAt || complaint.createdAt)}</p>
-                    <Link
-                      to={`/complaints/${complaint.id}`}
-                      className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
-                    >
-                      View details
-                    </Link>
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        to={`/complaints/${complaint.id}`}
+                        className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100"
+                      >
+                        View details
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(complaint)}
+                        disabled={deletingId === complaint.id}
+                        className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {deletingId === complaint.id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

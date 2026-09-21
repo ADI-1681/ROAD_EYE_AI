@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import adminService from '../../shared/adminService';
 import { COMPLAINT_STATUS, SEVERITY_META, STATUS_META } from '../../shared/constants';
+import ComplaintLocationMap from '../../shared/components/ComplaintLocationMap';
 
 const nextStatusMap = {
   [COMPLAINT_STATUS.PENDING]: COMPLAINT_STATUS.IN_PROGRESS,
@@ -13,7 +14,6 @@ export default function ComplaintDetail() {
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
   const loadComplaint = async () => {
@@ -57,27 +57,6 @@ export default function ComplaintDetail() {
       setError(err?.message || 'Unable to update complaint status.');
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleAfterImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file || !complaint) return;
-
-    setUploading(true);
-    setError('');
-
-    try {
-      const updated = await adminService.uploadAfterImage(complaint.id, {
-        ...file,
-        preview: URL.createObjectURL(file),
-      });
-      setComplaint(updated);
-    } catch (err) {
-      setError(err?.message || 'Unable to upload the after image.');
-    } finally {
-      setUploading(false);
-      event.target.value = '';
     }
   };
 
@@ -161,36 +140,26 @@ export default function ComplaintDetail() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-900">Before / after</h3>
-              <label className="cursor-pointer rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700">
-                {uploading ? 'Uploading...' : 'Upload after image'}
-                <input type="file" accept="image/*" className="hidden" onChange={handleAfterImageUpload} />
-              </label>
+          {complaint.image_url ? (
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-slate-900">Uploaded photo</h3>
+              <img src={complaint.image_url} alt="Uploaded road issue" className="mt-5 h-72 w-full rounded-2xl object-cover" />
             </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="mb-2 text-sm font-medium text-slate-500">Before</p>
-                <img src={complaint.image_url} alt="Before report" className="h-60 w-full rounded-2xl object-cover" />
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-medium text-slate-500">After</p>
-                <img
-                  src={complaint.after_image_url || 'https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=1200&q=80'}
-                  alt="After work"
-                  className="h-60 w-full rounded-2xl object-cover"
-                />
-              </div>
-            </div>
-          </div>
+          ) : null}
         </div>
 
         <aside className="space-y-6">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-bold text-slate-900">Location</h3>
             <p className="mt-3 text-sm text-slate-600">{complaint.location.address}</p>
+            <div className="mt-4 overflow-hidden rounded-2xl">
+              <ComplaintLocationMap
+                lat={complaint.location.lat}
+                lng={complaint.location.lng}
+                address={complaint.location.address}
+                locations={complaint.photo_locations || []}
+              />
+            </div>
             <div className="mt-4 rounded-2xl bg-slate-50 p-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">Coordinates</p>
               <p className="mt-2 text-sm text-slate-700">

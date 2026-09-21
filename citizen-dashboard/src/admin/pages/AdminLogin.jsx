@@ -70,7 +70,6 @@ export default function AdminLogin() {
               type="text"
               inputMode="email"
               autoComplete="username"
-              pattern=".+@gmail\\.com"
               title="Use your Gmail address"
               value={form.email}
               onChange={handleChange}

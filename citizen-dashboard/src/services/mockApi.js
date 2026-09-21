@@ -204,7 +204,13 @@ export const mockApi = {
 
   async getDashboardSummary() {
     await wait();
-    return mockDashboardStats;
+    const resolved = mockComplaints.filter((item) => item.status === 'resolved').length;
+    return {
+      ...mockDashboardStats,
+      totalComplaints: mockComplaints.length,
+      resolvedThisMonth: resolved,
+      responseRate: mockComplaints.length ? 100 : 0,
+    };
   },
 
   async getComplaints() {
@@ -321,7 +327,9 @@ export const mockApi = {
       updatedAt: new Date().toISOString(),
       assignedTo: 'Awaiting assignment',
       resolutionNote: 'Complaint submitted and awaiting validation.',
-      photoBefore: payload.photoBefore || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=80',
+      photoBefore: payload.photoBefore || '',
+      photos: (payload.photos || []).slice(0, 5),
+      photoLocations: (payload.photoLocations || []).slice(0, 5),
       photoAfter: payload.photoAfter || '',
       sentiment: 60,
       insights: ['Submitted successfully'],
@@ -329,6 +337,13 @@ export const mockApi = {
 
     mockComplaints.unshift(complaint);
     return complaint;
+  },
+
+  async deleteComplaint(id) {
+    await wait(300);
+    const complaintIndex = mockComplaints.findIndex((item) => item.id === id);
+    if (complaintIndex < 0) throw new Error('Complaint not found');
+    mockComplaints.splice(complaintIndex, 1);
   },
 
   async getNotifications() {

@@ -1,5 +1,14 @@
 fastapi==0.115.0
 uvicorn[standard]==0.30.6
 pydantic==2.9.2
-python-multipart==0.0.1
+python-multipart==0.0.20
 email-validator==2.2.0
+httpx
+Pillow
+ultralytics
+huggingface_hub
+motor
+certifi
+bcrypt
+PyJWT
+python-dotenv

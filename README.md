@@ -68,6 +68,14 @@ VITE_API_BASE_URL=http://localhost:8000/api
 VITE_USE_MOCK=true
 ```
 
+### Backend persistence
+
+The backend now requires MongoDB and stores users, drafts, and complaints there. Copy `backend/.env.example` to `backend/.env`, set `MONGODB_URI` and `MONGODB_DB_NAME`, then start the API with the repository virtual environment. Drafts expire after 24 hours; confirmed complaints survive backend restarts.
+
+### Image analyzer
+
+The backend uses the LLM analyzer by default. Set `ANALYZER=yolo` to use the local YOLO pothole detector, or `ANALYZER=hybrid` to run YOLO first and use the LLM for richer reasoning with YOLO fallback. The first YOLO or hybrid startup downloads approximately 20 MB of `best.pt` weights from HuggingFace and subsequent runs use the local HuggingFace cache.
+
 ## Access rules
 
 - Only Gmail addresses are accepted for login and registration.

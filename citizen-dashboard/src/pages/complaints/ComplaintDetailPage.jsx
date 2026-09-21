@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { APP_ROUTES, STATUS_META } from '../../constants/app';
 import service from '../../services';
+import ComplaintLocationMap from '../../shared/components/ComplaintLocationMap';
 
 const formatDate = (value) => {
   if (!value) return 'Recently';
@@ -91,6 +92,7 @@ export default function ComplaintDetailPage() {
 
   const reportCode = complaint.report_code || complaint.id;
   const mapQuery = encodeURIComponent(complaint.landmark || complaint.address || complaint.location || 'Road issue');
+  const [latitude, longitude] = String(complaint.location || '').split(',').map(Number);
 
   return (
     <div className="space-y-6">
@@ -154,6 +156,14 @@ export default function ComplaintDetailPage() {
                   Open in Maps
                 </a>
               </div>
+              <div className="sm:col-span-2 overflow-hidden rounded-2xl bg-white p-0">
+                <ComplaintLocationMap
+                  lat={latitude}
+                  lng={longitude}
+                  address={complaint.address || complaint.landmark || 'Complaint location'}
+                  locations={complaint.photoLocations || []}
+                />
+              </div>
               <div className="rounded-2xl bg-slate-50 p-4 sm:col-span-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Landmark</p>
                 <p className="mt-2 font-semibold text-slate-900">{complaint.landmark || 'Not provided'}</p>
@@ -161,19 +171,12 @@ export default function ComplaintDetailPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-xl font-bold text-slate-900">Before / after</h3>
-            <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="mb-2 text-sm font-medium text-slate-500">Before</p>
-                <img src={complaint.photoBefore || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=80'} alt="Before repair" className="h-56 w-full rounded-2xl object-cover" />
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-medium text-slate-500">After</p>
-                <img src={complaint.photoAfter || complaint.photoBefore || 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=80'} alt="After repair" className="h-56 w-full rounded-2xl object-cover" />
-              </div>
+          {complaint.photoBefore ? (
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-xl font-bold text-slate-900">Uploaded photo</h3>
+              <img src={complaint.photoBefore} alt="Uploaded road issue" className="mt-5 h-72 w-full rounded-2xl object-cover" />
             </div>
-          </div>
+          ) : null}
         </div>
 
         <aside className="space-y-6">

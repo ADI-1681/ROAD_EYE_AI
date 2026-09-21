@@ -1,8 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import adminService from '../../shared/adminService';
 import { SEVERITY_META, STATUS_META } from '../../shared/constants';
+
+const DEFAULT_CENTER = [12.9716, 77.5946];
+
+const getComplaintCoordinates = (complaint) => {
+  const location = complaint?.location;
+  const latitude = Number(location?.lat ?? String(location || '').split(',')[0]);
+  const longitude = Number(location?.lng ?? String(location || '').split(',')[1]);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return DEFAULT_CENTER;
+  return [latitude, longitude];
+};
 
 export default function MapOverview() {
   const [complaints, setComplaints] = useState([]);
@@ -39,8 +50,9 @@ export default function MapOverview() {
 
   const center = useMemo(() => {
     if (complaints.length === 0) return [12.9716, 77.5946];
-    const averageLat = complaints.reduce((sum, item) => sum + item.location.lat, 0) / complaints.length;
-    const averageLng = complaints.reduce((sum, item) => sum + item.location.lng, 0) / complaints.length;
+    const coordinates = complaints.map(getComplaintCoordinates);
+    const averageLat = coordinates.reduce((sum, item) => sum + item[0], 0) / coordinates.length;
+    const averageLng = coordinates.reduce((sum, item) => sum + item[1], 0) / coordinates.length;
     return [averageLat, averageLng];
   }, [complaints]);
 
@@ -88,31 +100,14 @@ export default function MapOverview() {
               const statusMeta = STATUS_META[complaint.status] || STATUS_META.pending;
               const severityMeta = SEVERITY_META[complaint.analysis.severity] || SEVERITY_META.medium;
 
-              const colorMap = {
-                neutral: '#64748b',
-                warning: '#f59e0b',
-                success: '#10b981',
-                danger: '#ef4444',
-              };
-
-              const statusColor = colorMap[statusMeta.tone] || '#64748b';
-              const severityColor = colorMap[severityMeta.tone] || '#64748b';
-
               return (
-                <CircleMarker
+                <Marker
                   key={complaint.id}
-                  center={[complaint.location.lat, complaint.location.lng]}
-                  radius={12}
-                  pathOptions={{
-                    color: complaint.status === 'resolved' ? statusColor : severityColor,
-                    fillColor: complaint.status === 'resolved' ? statusColor : severityColor,
-                    fillOpacity: 0.85,
-                    weight: 2,
-                  }}
+                  position={getComplaintCoordinates(complaint)}
                 >
                   <Popup>
                     <div className="space-y-2">
-                      <div className="font-bold text-slate-900">{complaint.id}</div>
+                      <div className="font-bold text-slate-900">{complaint.report_code || complaint.id}</div>
                       <div className="text-sm text-slate-600">{complaint.analysis.issue_type}</div>
                       <div className="text-xs text-slate-500">{complaint.location.address}</div>
                       <div className="flex gap-2 pt-1">
@@ -125,7 +120,7 @@ export default function MapOverview() {
                       </div>
                     </div>
                   </Popup>
-                </CircleMarker>
+                </Marker>
               );
             })}
           </MapContainer>

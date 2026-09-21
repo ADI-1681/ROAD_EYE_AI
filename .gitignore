@@ -1,3 +1,6 @@
+.env
+backend/.env
+backend/test_connection.py
 # Local environment configuration
 .env
 .env.*

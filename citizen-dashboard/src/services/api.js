@@ -81,9 +81,15 @@ const apiService = {
     return normalizeComplaint(data);
   },
 
+  async deleteComplaint(id) {
+    await api.delete(`/complaints/${id}`);
+  },
+
   async analyzeComplaint(payload) {
     try {
-      const { data } = await api.post('/complaints/analyze', payload);
+      const formData = new FormData();
+      formData.append('image', payload);
+      const { data } = await api.post('/complaints/analyze', formData);
       return normalizeAnalysisResult(data?.analysis || data || {});
     } catch (error) {
       if (error?.response?.status === 422 && error?.response?.data) {
