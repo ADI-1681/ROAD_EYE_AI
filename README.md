@@ -71,3 +71,105 @@ Issue Resolved
 Resolution Evidence
    ↓
 Citizen Gets Update
+
+                    ┌─────────────────────┐
+                    │      CITIZENS       │
+                    │                     │
+                    │  Report Road Issue  │
+                    │  Upload Images      │
+                    │  Track Complaints   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   REACT FRONTEND    │
+                    │                     │
+                    │  Citizen Portal     │
+                    │  Admin Portal       │
+                    │  Maps               │
+                    │  Complaint UI       │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │    FASTAPI API      │
+                    │                     │
+                    │ Authentication      │
+                    │ Complaints          │
+                    │ Dashboard           │
+                    │ Admin Management    │
+                    └──────────┬──────────┘
+                               │
+                 ┌─────────────┴─────────────┐
+                 ▼                           ▼
+       ┌─────────────────┐         ┌─────────────────┐
+       │   AI ANALYSIS   │         │      MAPS       │
+       │                 │         │                 │
+       │ Image Analysis  │         │ OpenStreetMap   │
+       │ Issue Detection │         │ Leaflet         │
+       │ Severity        │         │ Location Data   │
+       └─────────────────┘         └─────────────────┘
+
+📁 Project Structure
+ROAD_EYE_AI/
+│
+├── citizen-dashboard/
+│   │
+│   ├── public/
+│   │
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── assets/
+│   │   └── ...
+│   │
+│   ├── package.json
+│   ├── vite.config.js
+│   └── ...
+│
+├── backend/
+│   │
+│   ├── app.py
+│   ├── requirements.txt
+│   └── ...
+│
+└── README.md
+
+
+✨ Features
+👤 Citizen Portal
+🔐 Authentication
+Citizen registration
+Citizen login
+Authentication flow
+Protected dashboard routes
+📊 Citizen Dashboard
+Civic summary cards
+Complaint statistics
+Recent complaints
+Complaint status overview
+📝 Report Road Issue
+
+Citizens can submit road complaints with:
+
+Issue category
+Description
+Location
+Priority
+Road images
+Additional issue information
+🖼️ Image Upload
+Upload multiple images
+Image validation
+Image size validation
+Before/after evidence
+📋 Complaint Tracking
+
+Citizens can:
+
+View submitted complaints
+Open complaint details
+Track complaint status
+View issue information
+View resolution evidence
