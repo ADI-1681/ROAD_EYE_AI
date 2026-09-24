@@ -1,4 +1,4 @@
-Absolutely yaar 😎 Here is the **complete README.md text**. Just copy everything inside the box and paste it into your GitHub `README.md`.
+
 
 ````markdown
 # 🚧 ROAD EYE AI
@@ -824,5 +824,5 @@ Add an appropriate open-source license before distributing the project as a prod
 
 ```
 
-**Bas isko pura copy karke `README.md` mein paste kar dena.** It will look much more professional on GitHub.
+
 ```
